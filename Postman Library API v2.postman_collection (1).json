@@ -1,0 +1,97 @@
+{
+  "name": "skill check",
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "apikey": [
+        {
+          "key": "value",
+          "value": "skillcheck",
+          "type": "string"
+        },
+        {
+          "key": "key",
+          "value": "student-expert",
+          "type": "string"
+        }
+      ]
+    },
+    "method": "POST",
+    "header": [],
+    "body": {
+      "mode": "raw",
+      "raw": "{\n\"actorName\": \"Leonardo Di Caprio\"\n}",
+      "options": {
+        "raw": {
+          "language": "json"
+        }
+      }
+    },
+    "url": {
+      "raw": "{{skillcheckBaseUrl}}/post?movieName=Inception",
+      "host": [
+        "{{skillcheckBaseUrl}}"
+      ],
+      "path": [
+        "post"
+      ],
+      "query": [
+        {
+          "key": "movieName",
+          "value": "Inception"
+        }
+      ]
+    }
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "pm.test(\"Response status code is 200\", function () {",
+          "    pm.response.to.have.status(200);",
+          "});",
+          "",
+          "pm.test(\"Response time is in an acceptable range\", function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(500);",
+          "});",
+          "",
+          "pm.test(\"Validate the response schema for required fields\", function () {",
+          "    const responseData = pm.response.json();",
+          "    pm.expect(responseData).to.be.an(\"object\");",
+          "    pm.expect(responseData).to.have.property(\"data\");",
+          "    pm.expect(responseData.data).to.have.property(\"actorName\");",
+          "    pm.expect(responseData.data.actorName).to.not.be.empty;",
+          "    pm.expect(responseData.data).to.have.property(\"movieName\");",
+          "    pm.expect(responseData.data.movieName).to.not.be.empty;",
+          "});",
+          "",
+          "pm.test(\"Actor name field must be present and not empty\", function () {",
+          "    const responseData = pm.response.json();",
+          "    pm.expect(responseData.data.actorName).to.eql(\"Leonardo Di Caprio\");",
+          "});",
+          "",
+          "pm.test(\"Movie name field must be present and not empty\", function () {",
+          "    const responseData = pm.response.json();",
+          "    pm.expect(responseData.data.movieName).to.eql(\"Inception\");",
+          "});",
+          "",
+          "pm.test(\"Content-Type header is application/json\", function () {",
+          "    pm.response.to.have.header(\"Content-Type\", /application\\/json/);",
+          "});",
+          "",
+          "pm.test(\"Presence of movieName field in the response body\", function () {",
+          "    const responseData = pm.response.json();",
+          "    pm.expect(responseData).to.have.property(\"data\");",
+          "    pm.expect(responseData.data).to.have.property(\"movieName\");",
+          "});",
+          "",
+          "// Set a collection variable",
+          "let responseData = pm.response.json();",
+          "pm.collectionVariables.set(\"favoriteActor\", responseData.data.actorName);"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ]
+}
